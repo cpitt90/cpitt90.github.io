@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fund Finance Ratings — Chris Pitt UX Designer</title>
+  <meta name="description" content="Case study: Joined a new product at Moody's Analytics with three months to launch, no handoff, and a team that had lost analyst trust. Shipped on time." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Fraunces:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    :root {
+      --bg:         #0A0E1A;
+      --bg-card:    #111827;
+      --bg-card-2:  #1A2236;
+      --border:     rgba(99,130,200,.15);
+      --border-glow:rgba(99,130,200,.35);
+      --text:       #F0F2F8;
+      --muted:      #9DAABF;
+      --subtle:     #92A6BC;
+      --accent:     #6FBEFC;
+      --accent-2:   #A8D8FF;
+      --accent-glow:rgba(79,142,247,.2);
+      --rust:       #C4622D;
+      --ease:       cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    a { color: inherit; text-decoration: none; cursor: none; }
+    ul { list-style: none; }
+    button { font-family: inherit; cursor: none; border: none; background: none; }
+
+    /* ── Scroll progress bar ── */
+    #progress-bar {
+      position: fixed; top: 0; left: 0; height: 2px; width: 0%;
+      background: linear-gradient(90deg, var(--accent), #A8D8FF, rgba(34,211,238,.8));
+      z-index: 9998;
+      transition: width .1s linear;
+      box-shadow: 0 0 8px rgba(111,190,252,.5);
+    }
+
+    /* ── Custom cursor ── */
+    #cur {
+      width: 10px; height: 10px; background: var(--accent); border-radius: 50%;
+      position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999;
+      transform: translate(-50%,-50%);
+      transition: width .2s var(--ease), height .2s var(--ease), opacity .2s;
+      box-shadow: 0 0 12px rgba(79,142,247,.5);
+    }
+    body.ch #cur { width: 36px; height: 36px; opacity: .6; }
+
+    /* ── Section nav dots ── */
+    .section-dots {
+      position: fixed; right: 32px; top: 50%;
+      transform: translateY(-50%);
+      z-index: 50;
+      display: flex; flex-direction: column; align-items: flex-end;
+      gap: 0;
+      padding: 16px 18px;
+      background: rgba(10,14,26,.55);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 20px;
+    }
+    .section-dots-track {
+      position: absolute; right: 3px; top: 10px; bottom: 10px; width: 1px;
+      background: rgba(255,255,255,.08);
+    }
+    .section-dots-fill {
+      position: absolute; top: 0; left: 0; width: 100%;
+      background: var(--accent);
+      transition: height .3s var(--ease);
+    }
+    .section-dot {
+      display: flex; align-items: center; gap: 10px;
+      cursor: pointer; padding: 7px 0;
+      position: relative;
+      background: none; border: none; outline: none;
+    }
+    .section-dot-label {
+      font-family: 'DM Mono', monospace; font-size: 11px;
+      color: var(--subtle); letter-spacing: .04em; text-transform: uppercase;
+      white-space: nowrap; text-align: right;
+      transition: color .25s var(--ease);
+      pointer-events: none;
+    }
+    .section-dot-pip {
+      width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.1);
+      transition: background .25s var(--ease), box-shadow .25s var(--ease), transform .25s var(--ease);
+      position: relative; z-index: 1;
+    }
+    .section-dot.active .section-dot-pip {
+      background: var(--accent);
+      box-shadow: 0 0 8px rgba(111,190,252,.7);
+      transform: scale(1.4);
+    }
+    .section-dot.active .section-dot-label { color: var(--accent); }
+    @media (hover: hover) and (pointer: fine) {
+      .section-dot:hover .section-dot-label { color: var(--muted); }
+      .section-dot:hover .section-dot-pip { background: rgba(255,255,255,.45); }
+    }
+    @media (max-width: 1024px) { .section-dots { display: none; } }
+
+    /* ── Background ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 8% 12%, rgba(79,142,247,.11) 0%, transparent 60%),
+        radial-gradient(ellipse 45% 40% at 92% 72%, rgba(34,211,238,.07) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 300px 300px;
+    }
+
+    main, header, footer, a.next-project { position: relative; z-index: 1; }
+
+    /* ── Floating Pill Nav ── */
+    .site-header {
+      position: fixed; top: 20px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      width: calc(100% - 32px);
+      max-width: 1400px;
+    }
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 6px 6px 28px;
+      background: rgba(15,20,40,.65);
+      backdrop-filter: blur(40px) saturate(200%);
+      -webkit-backdrop-filter: blur(40px) saturate(200%);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 100px;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.12),
+        0 8px 32px rgba(0,0,0,.5),
+        0 0 0 1px rgba(79,142,247,.08);
+    }
+    .nav-logo {
+      font-size: 14px; font-weight: 700;
+      color: var(--text); letter-spacing: -.015em;
+    }
+    .nav-links { display: flex; align-items: center; gap: 2px; }
+    .nav-link {
+      font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted);
+      letter-spacing: .04em; text-transform: uppercase;
+      padding: 9px 20px; border-radius: 100px;
+      transition: background .2s var(--ease), color .2s var(--ease);
+      display: block;
+    }
+    .nav-link:hover { background: rgba(255,255,255,.08); color: var(--text); }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 100vh;
+      padding: 140px 80px 100px;
+      display: flex; flex-direction: column; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(79,142,247,.5), rgba(34,211,238,.4), transparent);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 32px;
+    }
+    .hero-back {
+      font-family: 'DM Mono', monospace; font-size: 12px; color: var(--subtle);
+      letter-spacing: .06em; text-transform: uppercase;
+      transition: color .2s var(--ease);
+    }
+    .hero-back:hover { color: var(--accent); }
+    .hero-back-sep {
+      width: 1px; height: 14px; background: rgba(255,255,255,.15);
+    }
+    .hero-tag {
+      font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent);
+      letter-spacing: .12em; text-transform: uppercase; font-weight: 600;
+    }
+    .hero-h1 {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(44px, 6vw, 80px); font-weight: 700;
+      line-height: 1.06; letter-spacing: -.04em;
+      margin-bottom: 56px; max-width: 800px;
+    }
+    .hero-meta-row {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 1px; border: 1px solid var(--border); border-radius: 16px;
+      overflow: hidden; max-width: 860px; background: var(--border);
+    }
+    .hero-meta-item {
+      background: rgba(255,255,255,.07);
+      backdrop-filter: blur(48px) saturate(200%);
+      -webkit-backdrop-filter: blur(48px) saturate(200%);
+      padding: 24px 28px;
+    }
+    .hero-meta-item:first-child { border-radius: 16px 0 0 16px; }
+    .hero-meta-item:last-child  { border-radius: 0 16px 16px 0; }
+    .hero-meta-label {
+      font-family: 'DM Mono', monospace; font-size: 12px; color: var(--subtle);
+      letter-spacing: .10em; text-transform: uppercase;
+      font-weight: 600; margin-bottom: 8px; display: block;
+    }
+    .hero-meta-value { font-size: 15px; font-weight: 700; line-height: 1.35; }
+
+    /* ── TLDR ── */
+    .tldr {
+      padding: 80px;
+      background: rgba(255,255,255,.05);
+      backdrop-filter: blur(60px) saturate(200%);
+      -webkit-backdrop-filter: blur(60px) saturate(200%);
+      position: relative; overflow: hidden;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
+    }
+    .tldr::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(79,142,247,.5), rgba(34,211,238,.4), transparent);
+    }
+    .tldr::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(79,142,247,.5), rgba(34,211,238,.4), transparent);
+    }
+    .tldr-label {
+      font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent);
+      letter-spacing: .12em; text-transform: uppercase;
+      font-weight: 600; margin-bottom: 28px; display: block;
+    }
+    .tldr-text {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(20px, 2.2vw, 28px); font-weight: 600;
+      color: var(--text); line-height: 1.55; max-width: 860px;
+    }
+    .tldr-text .highlight { color: var(--accent-2); }
+
+    /* ── Two-column sections ── */
+    .section {
+      display: grid; grid-template-columns: 200px 1fr;
+      align-items: start; position: relative;
+    }
+    .section::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(79,142,247,.5) 30%, rgba(34,211,238,.4) 60%, transparent 100%);
+      pointer-events: none; z-index: 2;
+    }
+    .section::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(79,142,247,.3) 30%, rgba(34,211,238,.25) 60%, transparent 100%);
+      pointer-events: none; z-index: 2;
+    }
+    .section-left {
+      padding: 80px 0 80px 56px;
+      border-right: 1px solid var(--border);
+      position: sticky; top: 80px; align-self: start;
+    }
+    .section-label {
+      font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent);
+      letter-spacing: .10em; text-transform: uppercase;
+      font-weight: 600; display: block;
+      border-left: 2px solid var(--accent); padding-left: 12px;
+    }
+    .section-right { padding: 96px 80px 120px 64px; }
+
+    /* ── Section color alternating ── */
+    #plan, #design, #results { background: #0C1321; }
+
+    /* ── Typography ── */
+    .section-h {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(26px, 3vw, 40px); font-weight: 700;
+      line-height: 1.2; letter-spacing: -.02em;
+      margin-bottom: 36px; max-width: 720px;
+    }
+    .section-h .accent { color: var(--accent-2); }
+
+    .body-text {
+      font-size: 17px; color: #C8D4E6; line-height: 1.85;
+      margin-bottom: 32px; max-width: 680px;
+    }
+    .body-text strong { color: var(--text); font-weight: 700; }
+
+    /* ── Cards ── */
+    .card-list { margin: 40px 0; max-width: 720px; }
+    .card-item {
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 14px; padding: 28px 32px; margin-bottom: 12px;
+      display: grid; grid-template-columns: 40px 1fr;
+      gap: 20px; align-items: start;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 4px 16px rgba(0,0,0,.2);
+      transition: border-color .3s var(--ease), box-shadow .3s var(--ease), transform .3s var(--ease);
+    }
+    .card-item:hover {
+      border-color: rgba(79,142,247,.4);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 0 0 1px rgba(79,142,247,.2), 0 8px 40px rgba(79,142,247,.15);
+      transform: translateY(-3px) scale(1.005);
+    }
+    .card-num {
+      font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 600;
+      color: var(--accent); line-height: 1.6;
+    }
+    .card-content h3 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .card-content p { font-size: 15px; color: #B8C6DC; line-height: 1.75; }
+    .card-content p strong { color: var(--text); }
+
+    /* ── Image Placeholder ── */
+    .img-placeholder {
+      background: rgba(255,255,255,.03);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 16px; margin: 40px 0; overflow: hidden;
+      max-width: 720px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 8px 32px rgba(0,0,0,.2);
+    }
+    .img-placeholder-inner {
+      aspect-ratio: 16/9;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 14px;
+    }
+    .img-icon {
+      width: 52px; height: 52px; border: 1.5px dashed var(--subtle);
+      border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    }
+    .img-placeholder-label {
+      font-family: 'DM Mono', monospace; font-size: 12px; color: var(--subtle);
+      letter-spacing: .08em; text-transform: uppercase;
+    }
+    .img-caption {
+      padding: 16px 24px; border-top: 1px solid var(--border);
+      font-size: 13px; color: var(--muted); line-height: 1.6;
+    }
+    .img-caption strong { color: var(--text); }
+
+    /* ── Pull Quote ── */
+    .pull-quote {
+      background: rgba(79,142,247,.08);
+      backdrop-filter: blur(48px) saturate(200%);
+      -webkit-backdrop-filter: blur(48px) saturate(200%);
+      border: 1px solid rgba(79,142,247,.2); border-radius: 14px;
+      padding: 36px 40px; margin: 40px 0; max-width: 720px;
+      position: relative; overflow: hidden;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 8px 32px rgba(0,0,0,.2);
+    }
+    .pull-quote::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), var(--accent-2), rgba(255,255,255,.2), transparent);
+    }
+    .pull-quote p {
+      font-family: 'Fraunces', serif;
+      font-size: 20px; font-weight: 600; line-height: 1.5; color: var(--text);
+    }
+
+    /* ── Key Insight ── */
+    .key-insight {
+      background: rgba(79,142,247,.05);
+      backdrop-filter: blur(20px) saturate(150%);
+      -webkit-backdrop-filter: blur(20px) saturate(150%);
+      border: 1px solid rgba(79,142,247,.15); border-radius: 14px;
+      padding: 28px 32px; margin: 36px 0; max-width: 720px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .key-insight p { font-size: 15px; color: var(--text); line-height: 1.8; }
+    .key-insight strong { color: var(--accent-2); font-weight: 700; }
+
+    /* ── Results ── */
+    .results-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 16px; margin-top: 48px; max-width: 720px;
+    }
+    .result-card {
+      background: rgba(255,255,255,.07);
+      backdrop-filter: blur(48px) saturate(200%);
+      -webkit-backdrop-filter: blur(48px) saturate(200%);
+      border: 1px solid rgba(255,255,255,.08); border-radius: 16px;
+      padding: 36px 24px; text-align: center;
+      position: relative; overflow: hidden;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 8px 24px rgba(0,0,0,.2);
+      transition: border-color .3s var(--ease), box-shadow .3s var(--ease), transform .3s var(--ease);
+    }
+    .result-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), var(--accent-2), rgba(255,255,255,.2), transparent);
+    }
+    .result-card:hover {
+      border-color: rgba(79,142,247,.3);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 0 40px rgba(79,142,247,.12);
+      transform: translateY(-6px) scale(1.02);
+    }
+    .result-value {
+      font-family: 'Fraunces', serif;
+      font-size: 44px; font-weight: 700; color: var(--accent-2);
+      margin-bottom: 10px; line-height: 1;
+    }
+    .result-label { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    footer {
+      padding: 20px 80px; background: var(--bg);
+      border-top: 1px solid rgba(255,255,255,.06);
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      color: var(--subtle);
+      font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: .06em;
+      position: relative; z-index: 1;
+    }
+    .f-copy { white-space: nowrap; }
+    .f-next { color: var(--muted); letter-spacing: .04em; text-transform: uppercase; transition: color .2s var(--ease); white-space: nowrap; }
+    .f-next:hover { color: var(--accent); }
+
+    /* ── Reveal ── */
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s var(--ease), transform .6s var(--ease); }
+    .reveal.on { opacity: 1; transform: translateY(0); }
+    .reveal.d1 { transition-delay: 0.06s; }
+    .reveal.d2 { transition-delay: 0.12s; }
+    .reveal.d3 { transition-delay: 0.18s; }
+    .reveal.d4 { transition-delay: 0.24s; }
+
+    /* ── Mobile hamburger ── */
+    .hamburger { display: none; flex-direction: column; justify-content: center; align-items: center; width: 40px; height: 40px; gap: 5px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 100px; cursor: pointer; transition: background .2s; }
+    .hamburger:hover { background: rgba(255,255,255,.1); }
+    .hamburger span { display: block; width: 16px; height: 1.5px; background: var(--text); border-radius: 2px; transition: transform .25s var(--ease), opacity .25s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+    .nav-drawer { display: none; position: fixed; inset: 0; z-index: 199; background: rgba(10,14,26,.97); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); flex-direction: column; align-items: center; justify-content: center; gap: 8px; opacity: 0; pointer-events: none; transition: opacity .28s var(--ease); }
+    .nav-drawer.open { opacity: 1; pointer-events: all; }
+    .nav-drawer a { font-family: 'Fraunces', serif; font-size: clamp(36px, 10vw, 56px); font-weight: 700; letter-spacing: -.03em; color: var(--muted); transition: color .2s; }
+    .nav-drawer a:hover { color: var(--text); }
+    @media (max-width: 600px) {
+      nav { padding: 6px 6px 6px 20px; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .nav-drawer { display: flex; }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 1024px) {
+      .section { grid-template-columns: 1fr; }
+      .section-left { position: relative; top: auto; padding: 40px 48px 0; border-right: none; }
+      .section-right { padding: 48px; }
+      .hero { padding: 120px 48px 80px; }
+      .tldr { padding: 60px 48px; }
+      nav { padding: 6px 6px 6px 20px; }
+      .results-grid { grid-template-columns: 1fr; }
+      .next-project { padding: 80px 48px; flex-direction: column; align-items: flex-start; gap: 40px; }
+    }
+    @media (max-width: 640px) {
+      .hero { padding: 100px 24px 60px; }
+      .tldr { padding: 48px 24px; }
+      .section-right { padding: 40px 24px; }
+      .section-left { padding: 32px 24px 0; }
+      .hero-meta-row { grid-template-columns: 1fr; border-radius: 14px; }
+      .hero-meta-item:first-child { border-radius: 14px 14px 0 0; }
+      .hero-meta-item:last-child  { border-radius: 0 0 14px 14px; }
+      .next-project { padding: 60px 24px; }
+      footer { padding: 24px; }
+    }
+
+    /* ── Contact Modal ── */
+    .cmodal-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity .25s var(--ease); }
+    .cmodal-overlay.open { opacity: 1; pointer-events: all; }
+    .cmodal { background: #111827; border: 1px solid rgba(255,255,255,.12); border-radius: 24px; padding: 40px; width: 100%; max-width: 440px; position: relative; transform: translateY(16px) scale(0.98); transition: transform .35s var(--ease); box-shadow: 0 24px 80px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.1); }
+    .cmodal-overlay.open .cmodal { transform: translateY(0) scale(1); }
+    .cmodal-close { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.1); color: var(--muted); font-size: 16px; line-height: 1; display: flex; align-items: center; justify-content: center; outline: none; transition: background .2s var(--ease), color .2s var(--ease); }
+    .cmodal-close:hover { background: rgba(255,255,255,.14); color: var(--text); }
+    .cmodal-avail { display: inline-flex; align-items: center; gap: 6px; background: rgba(52,211,153,.1); border: 1px solid rgba(52,211,153,.2); border-radius: 100px; padding: 4px 10px 4px 8px; margin-bottom: 20px; }
+    .cmodal-avail-dot { width: 6px; height: 6px; border-radius: 50%; background: #34D399; box-shadow: 0 0 6px rgba(52,211,153,.6); flex-shrink: 0; }
+    .cmodal-avail-text { font-family: 'DM Mono', monospace; font-size: 11px; color: #34D399; letter-spacing: .06em; text-transform: uppercase; }
+    .cmodal-h { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 700; letter-spacing: -.03em; margin-bottom: 8px; color: var(--text); }
+    .cmodal-sub { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 32px; }
+    .cmodal-rows { display: flex; flex-direction: column; gap: 10px; }
+    .cmodal-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 18px 20px; transition: background .2s var(--ease), border-color .2s var(--ease); text-decoration: none; color: inherit; }
+    a.cmodal-row:hover { background: rgba(255,255,255,.09); border-color: rgba(111,190,252,.3); }
+    .cmodal-row-label { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--subtle); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
+    .cmodal-row-value { font-size: 15px; font-weight: 600; color: var(--text); }
+    .cmodal-copy-btn { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent); background: rgba(111,190,252,.1); border: 1px solid rgba(111,190,252,.2); border-radius: 100px; padding: 6px 14px; letter-spacing: .04em; text-transform: uppercase; transition: background .2s var(--ease); flex-shrink: 0; }
+    .cmodal-copy-btn:hover { background: rgba(111,190,252,.2); }
+    .cmodal-arrow { color: var(--accent); font-size: 18px; transition: transform .2s var(--ease); flex-shrink: 0; }
+    a.cmodal-row:hover .cmodal-arrow { transform: translateX(3px); }
+
+    /* ════════════════════════════════════════════
+       BROADSHEET — compressed palette
+       Dark zone:  hero #0A0E1A → TLDR #0F1D36
+       Light zone: sections #E8EEF8 / #DCE5F4
+       ════════════════════════════════════════════ */
+
+    .hero { min-height: auto; padding: 140px 80px 64px; justify-content: flex-start; }
+    .hero-img-wrap { position: relative; z-index: 1; width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 80px; }
+    .hero-img { width: 100%; border-radius: 16px; display: block; box-shadow: 0 24px 80px rgba(0,0,0,.5); border: 1px solid rgba(255,255,255,.07); }
+    .hero-img-section { padding: 64px 0; position: relative; z-index: 1; }
+    .hero-img-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(79,142,247,.4), rgba(34,211,238,.3), transparent); }
+    .hero-h1 { font-size: clamp(32px, 4vw, 60px); letter-spacing: -.03em; max-width: 860px; margin-bottom: 20px; }
+    .hero-deck { font-size: clamp(15px, 1.5vw, 19px); color: var(--muted); max-width: 580px; line-height: 1.55; margin-bottom: 48px; }
+
+    .tldr { background: #0F1D36; backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: none; }
+    .tldr::before { background: linear-gradient(90deg, transparent, rgba(111,190,252,.3), rgba(168,216,255,.25), transparent); }
+    .tldr::after { background: linear-gradient(90deg, transparent, rgba(30,58,138,.25), transparent); }
+
+    nav { background: rgba(10,14,26,.88); border-color: rgba(255,255,255,.1); }
+
+    #progress-bar { background: linear-gradient(90deg, #0F1D36, #1E3A8A, #2563EB); box-shadow: 0 0 6px rgba(30,58,138,.5); }
+
+    .section-dot-label { color: #C0CEDF; }
+    .section-dots { background: rgba(10,14,26,.92); border-color: rgba(255,255,255,.1); }
+
+    .section { background: #E8EEF8; }
+    #plan, #design, #results { background: #DCE5F4; }
+    .section::before { background: rgba(15,29,54,.12); }
+    .section-left { border-right-color: rgba(15,29,54,.12); }
+
+    .section-label { color: #1E3A8A; border-left-color: #1E3A8A; }
+    .section .section-h { color: #0A0E1A; }
+    .section .section-h .accent { color: #1E3A8A; }
+    .section .body-text { color: #1E293B; }
+    .section .body-text strong { color: #0A0E1A; }
+
+    .section .img-placeholder { background: #FFFFFF; border-color: rgba(15,29,54,.1); backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: 0 2px 12px rgba(15,29,54,.07); }
+    .section .img-placeholder-label { color: #374151; }
+    .section .img-icon { border-color: #6B82A8; color: #6B82A8; }
+    .section .img-caption { border-top-color: rgba(15,29,54,.08); color: #374151; }
+    .section .img-caption strong { color: #0A0E1A; }
+
+    .section .card-item { background: #FFFFFF; border: 1px solid rgba(15,29,54,.1); box-shadow: 0 2px 12px rgba(15,29,54,.08), 0 1px 0 rgba(15,29,54,.05); backdrop-filter: none; -webkit-backdrop-filter: none; }
+    @media (hover: hover) and (pointer: fine) {
+      .section .card-item:hover { border-color: rgba(30,58,138,.3); box-shadow: 0 6px 24px rgba(30,58,138,.12); transform: translateY(-2px) scale(1.003); }
+    }
+    .section .card-num { color: #1E3A8A; }
+    .section .card-content h3 { color: #0A0E1A; }
+    .section .card-content p { color: #374151; }
+    .section .card-content p strong { color: #0A0E1A; }
+
+    .section .artifact-caption { color: #374151; background: rgba(15,29,54,.04); border-top-color: rgba(15,29,54,.08); }
+    .section .artifact-caption strong { color: #0A0E1A; }
+
+    .section .pull-quote { background: rgba(30,58,138,.07); border-color: rgba(30,58,138,.22); box-shadow: inset 0 1px 0 rgba(30,58,138,.14); backdrop-filter: none; -webkit-backdrop-filter: none; }
+    .section .pull-quote::before { background: linear-gradient(90deg, transparent, rgba(30,58,138,.25), rgba(30,58,138,.45), rgba(30,58,138,.25), transparent); }
+    .section .pull-quote p { color: #0A0E1A; }
+
+    .section .key-insight { background: rgba(30,58,138,.06); border-color: rgba(30,58,138,.18); }
+    .section .key-insight p { color: #1E293B; }
+    .section .key-insight strong { color: #1E3A8A; }
+
+    /* Sub-label divider inside a section (signals a second beat) */
+    .section .sub-label { font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: #1E3A8A; margin: 48px 0 20px; padding-top: 24px; border-top: 1px solid rgba(15,29,54,.12); }
+
+    /* Before / After system model */
+    .before-after { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: 16px; margin: 32px 0; }
+    .before-after .ba-col { background: #FFFFFF; border: 1px solid rgba(15,29,54,.1); border-radius: 14px; padding: 24px; box-shadow: 0 2px 12px rgba(15,29,54,.08); }
+    .before-after .ba-after { border-color: rgba(30,58,138,.25); box-shadow: 0 2px 16px rgba(30,58,138,.12); }
+    .before-after .ba-tag { display: inline-block; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #9CA3AF; margin-bottom: 12px; }
+    .before-after .ba-after .ba-tag { color: #1E3A8A; }
+    .before-after .ba-col h3 { color: #0A0E1A; font-size: 17px; margin: 0 0 8px; }
+    .before-after .ba-col p { color: #374151; font-size: 14px; line-height: 1.6; margin: 0; }
+    .before-after .ba-arrow { align-self: center; color: #1E3A8A; font-size: 24px; font-weight: 700; }
+    @media (max-width: 640px) { .before-after { grid-template-columns: 1fr; } .before-after .ba-arrow { transform: rotate(90deg); justify-self: center; } }
+
+    .section .result-card { background: #FFFFFF; border: 1px solid rgba(15,29,54,.1); box-shadow: 0 2px 12px rgba(15,29,54,.08); }
+    .section .result-card::before { background: linear-gradient(90deg, transparent, rgba(30,58,138,.1), rgba(30,58,138,.18), rgba(30,58,138,.1), transparent); }
+    @media (hover: hover) and (pointer: fine) {
+      .section .result-card:hover { border-color: rgba(30,58,138,.25); box-shadow: 0 8px 32px rgba(30,58,138,.1); transform: translateY(-4px) scale(1.015); }
+    }
+    .section .result-value { color: #1E3A8A; }
+    .section .result-label { color: #374151; }
+  </style>
+</head>
+<body>
+  <div id="progress-bar"></div>
+  <div id="cur"></div>
+
+
+  <!-- Section nav dots -->
+  <aside class="section-dots" id="section-dots" aria-label="Page sections"></aside>
+
+  <header class="site-header">
+    <nav>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <a href="index.html" class="nav-logo">Chris Pitt</a>
+        <div style="display:flex;align-items:center;gap:6px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);border-radius:100px;padding:4px 10px 4px 8px;">
+          <span style="width:6px;height:6px;border-radius:50%;background:#34D399;display:block;box-shadow:0 0 6px rgba(52,211,153,.6);"></span>
+          <span style="font-family:'DM Mono',monospace;font-size:11px;color:#34D399;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;">Available for Work</span>
+        </div>
+      </div>
+      <ul class="nav-links">
+        <li><a href="index.html#work" class="nav-link">Work</a></li>
+        <li><a href="about.html" class="nav-link">About</a></li>
+        <li><a href="Chris-Pitt-Resume.pdf" target="_blank" class="nav-link">Resume</a></li>
+        <li><a href="#" class="nav-link" data-contact>Contact</a></li>
+      </ul>
+      <button class="hamburger" aria-label="Open menu" aria-expanded="false" id="ham">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Mobile nav drawer -->
+  <nav class="nav-drawer" id="drawer" aria-label="Mobile navigation">
+    <a href="index.html#work" class="drawer-link">Work</a>
+    <a href="about.html" class="drawer-link">About</a>
+    <a href="Chris-Pitt-Resume.pdf" target="_blank" class="drawer-link">Resume</a>
+    <a href="#" class="drawer-link" data-contact>Contact</a>
+  </nav>
+
+  <main>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-eyebrow reveal">
+        <a href="index.html#work" class="hero-back">← All work</a>
+        <div class="hero-back-sep"></div>
+        <span class="hero-tag">Fund Finance Ratings</span>
+      </div>
+      <h1 class="hero-h1 reveal d1">From spreadsheets to a structured decision system.</h1>
+      <p class="hero-deck reveal d1">Three months to launch, no handoff, and a team that had lost analyst trust.</p>
+      <div class="hero-meta-row reveal d2">
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Role</span>
+          <div class="hero-meta-value">Design Strategist<br/>+ User Researcher</div>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Company</span>
+          <div class="hero-meta-value">Moody's Analytics</div>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Timeline</span>
+          <div class="hero-meta-value">2025, 3 months<br/>to launch</div>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Impact</span>
+          <div class="hero-meta-value">34 users · 91 facilities · 1k+ activities</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Hero image -->
+    <div class="hero-img-section">
+      <div class="hero-img-wrap reveal">
+        <img src="Fund Finance Images/Final Designs 1.png" alt="Fund Finance Ratings platform: final covenants view" class="hero-img">
+      </div>
+    </div>
+
+    <!-- TLDR -->
+    <div class="tldr reveal">
+      <span class="tldr-label">TLDR</span>
+      <p class="tldr-text">Analysts were evaluating complex deals through <span class="highlight">spreadsheet-heavy manual workflows</span>. With three months to launch and a team that had lost trust, I reframed the tool around <span class="highlight">structured decision-making</span> and shipped on time.</p>
+    </div>
+
+    <!-- The Situation -->
+    <section class="section" id="the-situation">
+      <div class="section-left">
+        <span class="section-label">The Situation</span>
+      </div>
+      <div class="section-right">
+        <h2 class="section-h reveal">A new product, a broken process, and <span class="accent">three months to launch.</span></h2>
+
+        <p class="body-text reveal d1">Private Credit was a new line of business at Moody's, announced in late 2025. Analysts were evaluating complex, compliance-driven deals through spreadsheet-heavy manual workflows, interpreting financial rules by hand with no consistent structure.</p>
+
+        <p class="body-text reveal d1">I joined as lead designer with the deadline three months out and no formal handoff from the previous designer. What I walked into had five compounding problems.</p>
+
+        <div class="card-list reveal d2">
+          <div class="card-item">
+            <div class="card-num">01</div>
+            <div class="card-content">
+              <h3>No established business process</h3>
+              <p>The way Private Credit would actually operate was still being figured out <strong>at the same time</strong> we were building the tool. There was no stable foundation to design against.</p>
+            </div>
+          </div>
+          <div class="card-item">
+            <div class="card-num">02</div>
+            <div class="card-content">
+              <h3>Requirements getting lost</h3>
+              <p>Analysts told the process team, who told product, who told design. By the time requirements reached me they were <strong>misrepresented or missing entirely.</strong></p>
+            </div>
+          </div>
+          <div class="card-item">
+            <div class="card-num">03</div>
+            <div class="card-content">
+              <h3>Analysts losing confidence</h3>
+              <p>The analysts who were supposed to use this tool couldn't see their feedback reflected in the designs. They started questioning <strong>whether working with the product team was worth their time at all.</strong></p>
+            </div>
+          </div>
+          <div class="card-item">
+            <div class="card-num">04</div>
+            <div class="card-content">
+              <h3>Design built on assumptions</h3>
+              <p>The existing tool had been designed <strong>without direct analyst input.</strong> Core workflows weren't supported, and the product team had no way to discover this.</p>
+            </div>
+          </div>
+          <div class="card-item">
+            <div class="card-num">05</div>
+            <div class="card-content">
+              <h3>A hard deadline with no runway</h3>
+              <p>Three months to launch. No context from the previous designer. <strong>Every day spent untangling the situation was a day not spent building.</strong></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Plan of Action -->
+    <section class="section" id="plan">
+      <div class="section-left">
+        <span class="section-label">Plan of Action</span>
+      </div>
+      <div class="section-right">
+        <h2 class="section-h reveal">Three things had to <span class="accent">happen in parallel.</span></h2>
+
+        <p class="body-text reveal d1">I quickly assessed what was blocking us and focused on three tracks at once: understanding what analysts actually needed, rebuilding their confidence through visibility, and fixing how information flowed between teams.</p>
+
+        <div class="card-list reveal d2">
+          <div class="card-item">
+            <div class="card-num">01</div>
+            <div class="card-content">
+              <h3>Identify immediate need</h3>
+              <p>Analysts were clear the existing design didn't reflect what they asked for. Before anything else, I needed to understand <strong>what they actually needed.</strong></p>
+            </div>
+          </div>
+          <div class="card-item">
+            <div class="card-num">02</div>
+            <div class="card-content">
+              <h3>Rebuild analyst confidence</h3>
+              <p>The analysts had started questioning whether collaborating with the product team was worth their time. <strong>Getting that trust back was a prerequisite to getting anything done.</strong></p>
+            </div>
+          </div>
+          <div class="card-item">
+            <div class="card-num">03</div>
+            <div class="card-content">
+              <h3>Fix how information moved</h3>
+              <p>Requirements were getting distorted across too many layers. I needed a <strong>more direct way</strong> to gather and align on what needed to be built.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Research -->
+    <section class="section" id="research">
+      <div class="section-left">
+        <span class="section-label">Research</span>
+      </div>
+      <div class="section-right">
+        <h2 class="section-h reveal">I sat in with analysts, product, and process <span class="accent">separately, then together.</span></h2>
+
+        <p class="body-text reveal d1">To understand what each team was actually saying, I joined their meetings individually before trying to align them. I spent the first two weeks taking notes and mapping where requirements were getting lost. Three layers of communication meant that by the time something reached me, it had often been reinterpreted or dropped entirely.</p>
+
+        <p class="body-text reveal d3">It quickly became clear that analysts needed a way to <strong>upload documents and create covenants</strong> for each facility they were monitoring. Neither was supported in the existing tool, despite both having been raised multiple times.</p>
+
+        <p class="body-text reveal d3">I did a gap analysis of the existing design to map exactly what was missing. The findings were concrete: no way to monitor covenants, no separation between global and periodic data, no way to assign individual due dates, no way to organize uploaded documents.</p>
+
+        <div class="img-placeholder reveal d3">
+          <img src="Fund Finance Images/Gap Analysis.png" alt="Gap analysis of the existing design, annotated" style="width:100%;display:block;">
+          <div class="img-caption"><strong>Gap analysis</strong> of the existing design, annotated with what was missing and what had to be added for launch.</div>
+        </div>
+
+        <p class="body-text reveal d3">The harder work was upstream of the UI: the deal logic itself. I mapped how analysts matched entities and applied rating rules, turning tangled, case-by-case judgment into structured decision flows the tool could actually support.</p>
+
+        <div class="img-placeholder reveal d3">
+          <img src="Fund Finance Images/LP Mapping Flow.png" alt="LP mapping decision flow, system versus user" style="width:100%;display:block;" onerror="this.closest('.img-placeholder').style.display='none'">
+          <div class="img-caption"><strong>LP mapping logic.</strong> Where the system auto-validates an entity and where the analyst steps in, mapped as one consistent flow.</div>
+        </div>
+
+        <div class="img-placeholder reveal d3">
+          <img src="Fund Finance Images/LP Rating for new Facility.png" alt="LP rating decision logic for a new facility" style="width:100%;display:block;" onerror="this.closest('.img-placeholder').style.display='none'">
+          <div class="img-caption"><strong>Rating logic for a new facility.</strong> The rules behind a rating, structured into a repeatable decision path after methodology changes.</div>
+        </div>
+
+        <div class="key-insight reveal d4">
+          <p><strong>The core insight:</strong> Analysts didn't need more inputs. They needed structured decision-making. The tool should guide them toward consistent, defensible evaluations, not just capture data and leave the interpretation to them.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Design -->
+    <section class="section" id="design">
+      <div class="section-left">
+        <span class="section-label">Design</span>
+      </div>
+      <div class="section-right">
+        <h2 class="section-h reveal">Rather than designing in isolation, I brought analysts <span class="accent">into the process directly.</span></h2>
+
+        <p class="body-text reveal d1">Given how much had been lost in translation before I joined, I wanted analysts to see their requirements reflected in designs as they evolved, not after decisions had already been made. I ran two collaborative design sessions, walking through early work together and pressure-testing assumptions in real time.</p>
+
+        <div class="img-placeholder reveal d2">
+          <img src="Fund Finance Images/Ideadtion of Loans Table.png" alt="Figma ideation of the Loans table with team comments" style="width:100%;display:block;">
+          <div class="img-caption"><strong>Ideating in Figma</strong> with analyst champions. Designs evolved in real time, with feedback captured directly on the canvas.</div>
+        </div>
+
+        <p class="body-text reveal d3">The bigger shift was conceptual. Instead of a form that captured data and left the hard thinking to the analyst, the tool became a structured system that guided the decision.</p>
+
+        <div class="before-after reveal d3">
+          <div class="ba-col ba-before">
+            <span class="ba-tag">Before</span>
+            <h3>Raw data and manual calc</h3>
+            <p>Analysts collected facility data, uploaded spreadsheets, and interpreted financial rules by hand in ad-hoc formulas and free-text notes. Every deal was structured a little differently.</p>
+          </div>
+          <div class="ba-arrow" aria-hidden="true">→</div>
+          <div class="ba-col ba-after">
+            <span class="ba-tag">After</span>
+            <h3>A structured decision system</h3>
+            <p>Structured inputs feed a rules layer that validates and guides, producing consistent, defensible outputs. Inputs, rules engine, output, the same way every time.</p>
+          </div>
+        </div>
+
+        <p class="body-text reveal d3">After two sessions, we reached sign-off on the design direction. The key additions:</p>
+
+        <div class="card-list reveal d3">
+          <div class="card-item">
+            <div class="card-num">→</div>
+            <div class="card-content">
+              <h3>Covenant Tracking</h3>
+              <p>Added as a launch feature. The most critical missing workflow for analysts.</p>
+            </div>
+          </div>
+          <div class="card-item">
+            <div class="card-num">→</div>
+            <div class="card-content">
+              <h3>Global vs Periodic Data</h3>
+              <p>Clear separation between data types, letting analysts track across multiple reporting periods.</p>
+            </div>
+          </div>
+          <div class="card-item">
+            <div class="card-num">→</div>
+            <div class="card-content">
+              <h3>Document Upload</h3>
+              <p>Categorized document upload with AI-assisted data extraction.</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="body-text reveal d4">I annotated the direction so every change traced back to a specific gap analysts had raised. Nothing shipped that wasn't answering a documented need.</p>
+
+        <div class="img-placeholder reveal d4">
+          <img src="Fund Finance Images/Annotated Design Direction 1.png" alt="Annotated design direction for the document workflow" style="width:100%;display:block;">
+          <div class="img-caption"><strong>Annotated design direction.</strong> Each marker maps a solution back to a gap: multi-period tracking, categorized documents, AI-assisted extraction.</div>
+        </div>
+
+        <div class="img-placeholder reveal d4">
+          <img src="Fund Finance Images/Annotated Design Direction 2.png" alt="Annotated design direction for covenant tracking" style="width:100%;display:block;">
+          <div class="img-caption"><strong>Covenant tracking, resolved.</strong> The MVP feature analysts most needed, plus the global-versus-periodic separation the old tool lacked.</div>
+        </div>
+
+        <p class="body-text reveal d4">The shipped product pulled it together into one structured workflow.</p>
+
+        <div class="img-placeholder reveal d4">
+          <img src="Fund Finance Images/Final Designs 2.png" alt="Final documents screen with categorized upload and AI extraction" style="width:100%;display:block;">
+          <div class="img-caption"><strong>The shipped product.</strong> Categorized document upload with AI-assisted extraction, one structured workflow that resolved the gaps analysts had raised.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Changing How We Worked -->
+    <section class="section" id="process">
+      <div class="section-left">
+        <span class="section-label">Changing How We Worked with AI</span>
+      </div>
+      <div class="section-right">
+        <h2 class="section-h reveal">Fixing the product wasn't enough. I changed how the team <span class="accent">worked, and how the work got built.</span></h2>
+
+        <div class="sub-label reveal d1">The process</div>
+
+        <p class="body-text reveal d1">In parallel with the design work, I recognized that the communication breakdown was structural, not a one-off fix. Requirements would keep getting distorted unless the process changed. I drafted a proposal for a new, more direct way of collaborating across design, product, process, and the analyst team.</p>
+
+        <div class="key-insight reveal d3">
+          <p><strong>The anchor of the new model:</strong> A standing weekly design session that analyst champions were required to attend. Requirements were defined, designs evolved in real time, and decisions were made on the spot rather than relayed through layers of communication.</p>
+        </div>
+
+        <div class="sub-label reveal d3" style="margin-top:8px;">The tooling</div>
+
+        <p class="body-text reveal d3">The deadline also changed how I worked as a designer. To move fast without losing rigor, I prototyped with AI-assisted tools and took designs straight into code, shortening the loop from idea to shippable UI.</p>
+
+        <div class="card-list reveal d3">
+          <div class="card-item">
+            <div class="card-num">→</div>
+            <div class="card-content">
+              <h3>FullStory for real behavior</h3>
+              <p>Tracked how analysts actually used the tool, surfacing drop-offs and failure points that interviews alone would have missed.</p>
+            </div>
+          </div>
+          <div class="card-item">
+            <div class="card-num">→</div>
+            <div class="card-content">
+              <h3>AI-assisted prototyping</h3>
+              <p>Prototyped in Figma Make and Claude Code, iterating on real interfaces in hours instead of days.</p>
+            </div>
+          </div>
+          <div class="card-item">
+            <div class="card-num">→</div>
+            <div class="card-content">
+              <h3>Designer pushing code</h3>
+              <p>Moved from design to code to PR directly, using Claude Code and MCP to ship production-ready UI, not just mockups.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="img-placeholder reveal d4">
+          <img src="Fund Finance Images/Local Host Prototype.png" alt="Working prototype running locally at localhost:4200" style="width:100%;display:block;">
+          <div class="img-caption"><strong>A working prototype, not a mockup.</strong> Running the real interface locally to pressure-test flows before they shipped.</div>
+        </div>
+
+        <div class="img-placeholder reveal d4">
+          <img src="Fund Finance Images/Claude PR.png" alt="Pushing UI changes with Claude Code against the fund-finance-ui codebase" style="width:100%;display:block;">
+          <div class="img-caption"><strong>Design to code in one loop.</strong> Prototyping and pushing UI changes directly against the product codebase with Claude Code and MCP.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results -->
+    <section class="section" id="results">
+      <div class="section-left">
+        <span class="section-label">Results</span>
+      </div>
+      <div class="section-right">
+        <h2 class="section-h reveal">Launched on time, to real users, <span class="accent">with real adoption.</span></h2>
+
+        <p class="body-text reveal d1">The Private Credit tool launched on time. Given where we started, that was the most meaningful measure of success. Three months after launch, in a presentation to senior leadership, the team reported adoption numbers that validated both the design decisions and the new way of working.</p>
+
+        <div class="results-grid reveal d2">
+          <div class="result-card">
+            <div class="result-value" data-count="34">0</div>
+            <div class="result-label">Analysts onboarded in the first reporting period</div>
+          </div>
+          <div class="result-card">
+            <div class="result-value" data-count="91">0</div>
+            <div class="result-label">Facilities actively tracked at launch</div>
+          </div>
+          <div class="result-card">
+            <div class="result-value" data-suffix="k+">1</div>
+            <div class="result-label">Monitoring activities logged in the first cycle</div>
+          </div>
+        </div>
+
+        <p class="body-text reveal d2" style="margin-top:16px;font-size:13px;opacity:.7;">These are first-cycle numbers for a specialized institutional tool: a focused analyst team putting real deals through the system from day one, not a sandbox pilot.</p>
+
+        <div class="pull-quote reveal d3" style="margin-top: 56px;">
+          <p>If I were doing this again, I'd push harder to get direct analyst access earlier. The moments where we got the most useful signal were always when we went straight to end users.</p>
+        </div>
+
+        <div class="key-insight reveal d3" style="margin-top: 40px;">
+          <p><strong>What's next:</strong> pushing further into AI-assisted structuring of inputs, faster prototyping, and code-driven design workflows, so the tool keeps guiding decisions as Private Credit scales.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <span class="f-copy">© 2026 Chris Pitt</span>
+    <a href="work-manager-hub-broadsheet.html" class="f-next">← Back: Work Manager Hub</a>
+  </footer>
+
+  <script>
+    /* Custom cursor */
+    const cur = document.getElementById('cur');
+    document.addEventListener('mousemove', e => {
+      cur.style.left = e.clientX + 'px';
+      cur.style.top  = e.clientY + 'px';
+    });
+    document.querySelectorAll('a, button, .card-item, .result-card').forEach(el => {
+      el.addEventListener('mouseenter', () => document.body.classList.add('ch'));
+      el.addEventListener('mouseleave', () => document.body.classList.remove('ch'));
+    });
+
+    /* Scroll progress bar + section dot tracking */
+    const progressBar = document.getElementById('progress-bar');
+    const sectionIds    = ['the-situation','plan','research','design','process','results'];
+    const sectionLabels = ['Situation','Plan','Research','Design','AI Workflow','Results'];
+    const dotsNav = document.getElementById('section-dots');
+
+    const track = document.createElement('div');
+    track.className = 'section-dots-track';
+    const fill = document.createElement('div');
+    fill.className = 'section-dots-fill';
+    track.appendChild(fill);
+    dotsNav.appendChild(track);
+
+    sectionLabels.forEach((label, i) => {
+      const dot = document.createElement('button');
+      dot.className = 'section-dot';
+      dot.setAttribute('aria-label', 'Jump to ' + label);
+
+      const lbl = document.createElement('span');
+      lbl.className = 'section-dot-label';
+      lbl.textContent = label;
+
+      const pip = document.createElement('span');
+      pip.className = 'section-dot-pip';
+
+      dot.appendChild(lbl);
+      dot.appendChild(pip);
+
+      dot.addEventListener('click', () => {
+        const el = document.getElementById(sectionIds[i]);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      });
+      dotsNav.appendChild(dot);
+    });
+
+    const dotEls = dotsNav.querySelectorAll('.section-dot');
+    const sectionEls = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
+
+    window.addEventListener('scroll', () => {
+      const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+      progressBar.style.width = Math.min(pct, 100) + '%';
+
+      let active = 0;
+      sectionEls.forEach((el, i) => {
+        if (el.getBoundingClientRect().top < window.innerHeight * 0.45) active = i;
+      });
+      dotEls.forEach((d, i) => d.classList.toggle('active', i === active));
+      const fillPct = dotEls.length > 1 ? (active / (dotEls.length - 1)) * 100 : 0;
+      fill.style.height = fillPct + '%';
+    }, { passive: true });
+
+    /* Reveal on scroll */
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('on'); obs.unobserve(e.target); }
+      });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+    /* Animated stat counters */
+    const counterObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        const el = e.target;
+        const target   = parseInt(el.dataset.count);
+        const suffix   = el.dataset.suffix || '';
+        if (!target) return;
+        const duration = 1400;
+        const start    = performance.now();
+        const tick = now => {
+          const t = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - t, 3);
+          el.textContent = Math.round(eased * target) + suffix;
+          if (t < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+        counterObs.unobserve(el);
+      });
+    }, { threshold: 0.6 });
+    document.querySelectorAll('.result-value[data-count]').forEach(el => counterObs.observe(el));
+
+    // Hamburger
+    const ham = document.getElementById('ham');
+    const drawer = document.getElementById('drawer');
+    ham.addEventListener('click', () => {
+      const open = drawer.classList.toggle('open');
+      ham.classList.toggle('open', open);
+      ham.setAttribute('aria-expanded', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+    document.querySelectorAll('.drawer-link').forEach(l => {
+      l.addEventListener('click', () => {
+        drawer.classList.remove('open');
+        ham.classList.remove('open');
+        ham.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      });
+    });
+
+  </script>
+
+  <!-- Contact Modal -->
+  <div id="cmodal" class="cmodal-overlay" role="dialog" aria-modal="true" aria-label="Contact Chris Pitt">
+    <div class="cmodal">
+      <button class="cmodal-close" id="cmodal-close" aria-label="Close">×</button>
+      <div class="cmodal-avail"><span class="cmodal-avail-dot"></span><span class="cmodal-avail-text">Available for Work</span></div>
+      <h2 class="cmodal-h">Let's talk.</h2>
+      <p class="cmodal-sub">Available for full-time and contract roles in NYC and remote.</p>
+      <div class="cmodal-rows">
+        <div class="cmodal-row" style="cursor:default;">
+          <div>
+            <div class="cmodal-row-label">Email</div>
+            <div class="cmodal-row-value">c.pitt848@gmail.com</div>
+          </div>
+          <button class="cmodal-copy-btn" id="cmodal-copy">Copy</button>
+        </div>
+        <a href="https://www.linkedin.com/in/chris-pitt1/" target="_blank" rel="noopener" class="cmodal-row">
+          <div>
+            <div class="cmodal-row-label">LinkedIn</div>
+            <div class="cmodal-row-value">linkedin.com/in/chris-pitt1</div>
+          </div>
+          <span class="cmodal-arrow">→</span>
+        </a>
+        <a href="Chris-Pitt-Resume.pdf" target="_blank" class="cmodal-row">
+          <div>
+            <div class="cmodal-row-label">Resume</div>
+            <div class="cmodal-row-value">View PDF</div>
+          </div>
+          <span class="cmodal-arrow">↗</span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function() {
+      const overlay = document.getElementById('cmodal');
+      const open = e => { if(e) e.preventDefault(); overlay.classList.add('open'); document.body.style.overflow='hidden'; };
+      const close = () => { overlay.classList.remove('open'); document.body.style.overflow=''; };
+      document.getElementById('cmodal-close').addEventListener('click', close);
+      overlay.addEventListener('click', e => { if(e.target===overlay) close(); });
+      document.addEventListener('keydown', e => { if(e.key==='Escape') close(); });
+      document.getElementById('cmodal-copy').addEventListener('click', function() {
+        navigator.clipboard.writeText('c.pitt848@gmail.com');
+        this.textContent='Copied!'; setTimeout(()=>this.textContent='Copy',2000);
+      });
+      document.querySelectorAll('[data-contact]').forEach(el => el.addEventListener('click', open));
+    })();
+  </script>
+</body>
+</html>
