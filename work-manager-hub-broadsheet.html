@@ -63,6 +63,10 @@
       box-shadow: 0 0 12px rgba(79,142,247,.5);
     }
     body.ch #cur { width: 36px; height: 36px; opacity: .6; }
+    @media (hover: none), (pointer: coarse) {
+      #cur { display: none !important; }
+      body, a, button, .nav-link { cursor: auto !important; }
+    }
 
     /* ── Section nav ── */
     .section-dots {
@@ -568,10 +572,10 @@
     .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
     .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
     .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
-    .nav-drawer { display: none; position: fixed; inset: 0; z-index: 199; background: rgba(10,14,26,.97); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); flex-direction: column; align-items: center; justify-content: center; gap: 8px; opacity: 0; pointer-events: none; transition: opacity .28s var(--ease); }
-    .nav-drawer.open { opacity: 1; pointer-events: all; }
-    .nav-drawer a { font-family: 'Fraunces', serif; font-size: clamp(36px, 10vw, 56px); font-weight: 700; letter-spacing: -.03em; color: var(--muted); transition: color .2s; }
-    .nav-drawer a:hover { color: var(--text); }
+    .nav-drawer { display: none; position: fixed; top: calc(74px + env(safe-area-inset-top)); right: calc(16px + env(safe-area-inset-right)); z-index: 199; flex-direction: column; min-width: 190px; padding: 8px; background: rgba(15,20,40,.92); backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%); border: 1px solid rgba(255,255,255,.12); border-radius: 18px; box-shadow: 0 16px 44px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1); opacity: 0; pointer-events: none; transform: translateY(-8px) scale(0.97); transform-origin: top right; transition: opacity .2s var(--ease), transform .2s var(--ease); }
+    .nav-drawer.open { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
+    .nav-drawer a { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -.01em; text-align: left; padding: 13px 18px; border-radius: 12px; transition: background .15s var(--ease); }
+    .nav-drawer a:active { background: rgba(255,255,255,.09); }
     @media (max-width: 600px) {
       nav { padding: 6px 6px 6px 20px; }
       .nav-links { display: none; }
@@ -770,17 +774,17 @@
     /* ── Contact Modal ── */
     .cmodal-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity .25s var(--ease); }
     .cmodal-overlay.open { opacity: 1; pointer-events: all; }
-    .cmodal { background: #111827; border: 1px solid rgba(255,255,255,.12); border-radius: 24px; padding: 40px; width: 100%; max-width: 440px; position: relative; transform: translateY(16px) scale(0.98); transition: transform .35s var(--ease); box-shadow: 0 24px 80px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.1); }
+    .cmodal { background: #111827; border: 1px solid rgba(255,255,255,.12); border-radius: 22px; padding: 24px 24px 26px; width: 100%; max-width: 360px; position: relative; transform: translateY(16px) scale(0.98); transition: transform .35s var(--ease); box-shadow: 0 24px 80px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.1); }
     .cmodal-overlay.open .cmodal { transform: translateY(0) scale(1); }
     .cmodal-close { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.1); color: var(--muted); font-size: 16px; line-height: 1; display: flex; align-items: center; justify-content: center; outline: none; transition: background .2s var(--ease), color .2s var(--ease); }
     .cmodal-close:hover { background: rgba(255,255,255,.14); color: var(--text); }
-    .cmodal-avail { display: inline-flex; align-items: center; gap: 6px; background: rgba(52,211,153,.1); border: 1px solid rgba(52,211,153,.2); border-radius: 100px; padding: 4px 10px 4px 8px; margin-bottom: 20px; }
+    .cmodal-avail { display: inline-flex; align-items: center; gap: 6px; background: rgba(52,211,153,.1); border: 1px solid rgba(52,211,153,.2); border-radius: 100px; padding: 4px 10px 4px 8px; margin-bottom: 14px; }
     .cmodal-avail-dot { width: 6px; height: 6px; border-radius: 50%; background: #34D399; box-shadow: 0 0 6px rgba(52,211,153,.6); flex-shrink: 0; }
     .cmodal-avail-text { font-family: 'DM Mono', monospace; font-size: 11px; color: #34D399; letter-spacing: .06em; text-transform: uppercase; }
-    .cmodal-h { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 700; letter-spacing: -.03em; margin-bottom: 8px; color: var(--text); }
-    .cmodal-sub { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 32px; }
-    .cmodal-rows { display: flex; flex-direction: column; gap: 10px; }
-    .cmodal-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 18px 20px; transition: background .2s var(--ease), border-color .2s var(--ease); text-decoration: none; color: inherit; }
+    .cmodal-h { font-family: 'Fraunces', serif; font-size: 23px; font-weight: 700; letter-spacing: -.03em; margin-bottom: 8px; color: var(--text); }
+    .cmodal-sub { font-size: 13px; color: var(--muted); line-height: 1.55; margin-bottom: 18px; }
+    .cmodal-rows { display: flex; flex-direction: column; gap: 8px; }
+    .cmodal-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 13px 16px; transition: background .2s var(--ease), border-color .2s var(--ease); text-decoration: none; color: inherit; }
     a.cmodal-row:hover { background: rgba(255,255,255,.09); border-color: rgba(111,190,252,.3); }
     .cmodal-row-label { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--subtle); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
     .cmodal-row-value { font-size: 15px; font-weight: 600; color: var(--text); }
@@ -1197,23 +1201,25 @@
     }, { threshold: 0.6 });
     document.querySelectorAll('.result-value[data-count]').forEach(el => counterObs.observe(el));
 
-    // Hamburger
+    // Hamburger dropdown menu
     const ham = document.getElementById('ham');
     const drawer = document.getElementById('drawer');
-    ham.addEventListener('click', () => {
+    const closeMenu = () => {
+      drawer.classList.remove('open');
+      ham.classList.remove('open');
+      ham.setAttribute('aria-expanded', 'false');
+    };
+    ham.addEventListener('click', (e) => {
+      e.stopPropagation();
       const open = drawer.classList.toggle('open');
       ham.classList.toggle('open', open);
       ham.setAttribute('aria-expanded', open);
-      document.body.style.overflow = open ? 'hidden' : '';
     });
-    document.querySelectorAll('.drawer-link').forEach(l => {
-      l.addEventListener('click', () => {
-        drawer.classList.remove('open');
-        ham.classList.remove('open');
-        ham.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
-      });
+    document.querySelectorAll('.drawer-link').forEach(l => l.addEventListener('click', closeMenu));
+    document.addEventListener('click', (e) => {
+      if (drawer.classList.contains('open') && !drawer.contains(e.target) && !ham.contains(e.target)) closeMenu();
     });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
 
   </script>
 
@@ -1223,7 +1229,7 @@
       <button class="cmodal-close" id="cmodal-close" aria-label="Close">×</button>
       <div class="cmodal-avail"><span class="cmodal-avail-dot"></span><span class="cmodal-avail-text">Available for Work</span></div>
       <h2 class="cmodal-h">Let's talk.</h2>
-      <p class="cmodal-sub">Available for full-time and contract roles in NYC and remote.</p>
+      <p class="cmodal-sub">Full-time & contract roles · NYC or remote.</p>
       <div class="cmodal-rows">
         <div class="cmodal-row" style="cursor:default;">
           <div>
