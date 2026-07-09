@@ -174,9 +174,9 @@
     }
 
     /* ── Contact Modal ── */
-    .cmodal-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity .25s var(--ease); }
+    .cmodal-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: flex-start; justify-content: center; padding: calc(74px + env(safe-area-inset-top)) 16px 16px; opacity: 0; pointer-events: none; transition: opacity .25s var(--ease); }
     .cmodal-overlay.open { opacity: 1; pointer-events: all; }
-    .cmodal { background: #111827; border: 1px solid rgba(255,255,255,.12); border-radius: 22px; padding: 24px 24px 26px; width: 100%; max-width: 360px; position: relative; transform: translateY(16px) scale(0.98); transition: transform .35s var(--ease); box-shadow: 0 24px 80px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.1); }
+    .cmodal { background: #111827; border: 1px solid rgba(255,255,255,.12); border-radius: 22px; padding: 24px 24px 26px; width: 100%; max-width: 360px; position: relative; transform-origin: top center; transform: translateY(-10px) scale(0.97); transition: transform .3s var(--ease); box-shadow: 0 24px 80px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.1); }
     .cmodal-overlay.open .cmodal { transform: translateY(0) scale(1); }
     .cmodal-close { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.1); color: var(--muted); font-size: 16px; line-height: 1; display: flex; align-items: center; justify-content: center; outline: none; transition: background .2s var(--ease), color .2s var(--ease); }
     .cmodal-close:hover { background: rgba(255,255,255,.14); color: var(--text); }
@@ -194,14 +194,11 @@
     .cmodal-copy-btn:hover { background: rgba(111,190,252,.2); }
     .cmodal-arrow { color: var(--accent); font-size: 18px; transition: transform .2s var(--ease); flex-shrink: 0; }
     a.cmodal-row:hover .cmodal-arrow { transform: translateX(3px); }
-    .cmodal-handle { display: none; width: 40px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.22); margin: -4px auto 12px; flex-shrink: 0; }
+    .cmodal-handle { display: none; }
     @media (max-width: 600px) {
-      .cmodal-overlay { align-items: flex-end; padding: 0; }
-      .cmodal { max-width: 100%; width: 100%; border-radius: 24px 24px 0 0; padding: 14px 22px calc(28px + env(safe-area-inset-bottom)); transform: translateY(100%); transition: transform .4s var(--ease); }
-      .cmodal-overlay.open .cmodal { transform: translateY(0); }
-      .cmodal-handle { display: block; }
-      .cmodal-close { top: 16px; right: 16px; }
-      .cmodal-h { font-size: 25px; }
+      .cmodal-overlay { justify-content: flex-end; padding-top: calc(72px + env(safe-area-inset-top)); }
+      .cmodal { transform-origin: top right; }
+      .cmodal-h { font-size: 24px; }
     }
   </style>
 </head>
@@ -385,6 +382,7 @@
   <script>
     const cur = document.getElementById('cur');
     if (navigator.maxTouchPoints > 0 || 'ontouchstart' in window || matchMedia('(pointer: coarse)').matches) cur.style.display = 'none';
+    if (navigator.maxTouchPoints > 0 || 'ontouchstart' in window || matchMedia('(pointer: coarse)').matches) document.querySelectorAll('a[href$="Resume.pdf"]').forEach(a => a.removeAttribute('target'));
     document.addEventListener('mousemove', e => { cur.style.left = e.clientX + 'px'; cur.style.top = e.clientY + 'px'; });
     document.querySelectorAll('a, button').forEach(el => {
       el.addEventListener('mouseenter', () => document.body.classList.add('ch'));
@@ -432,7 +430,6 @@
   <!-- Contact Modal -->
   <div id="cmodal" class="cmodal-overlay" role="dialog" aria-modal="true" aria-label="Contact Chris Pitt">
     <div class="cmodal">
-      <div class="cmodal-handle" aria-hidden="true"></div>
       <button class="cmodal-close" id="cmodal-close" aria-label="Close">×</button>
       <div class="cmodal-avail"><span class="cmodal-avail-dot"></span><span class="cmodal-avail-text">Available for Work</span></div>
       <h2 class="cmodal-h">Let's talk.</h2>
@@ -475,24 +472,6 @@
       this.textContent='Copied!'; setTimeout(()=>this.textContent='Copy',2000);
     });
     document.querySelectorAll('[data-contact]').forEach(el => el.addEventListener('click', open));
-    const sheet = overlay.querySelector('.cmodal');
-    let startY = 0, curY = 0, dragging = false;
-    const sheetMode = () => matchMedia('(max-width: 600px)').matches;
-    sheet.addEventListener('pointerdown', e => {
-      if (!sheetMode() || e.target.closest('.cmodal-row, button, a')) return;
-      dragging = true; startY = e.clientY; curY = 0; sheet.style.transition = 'none';
-    });
-    document.addEventListener('pointermove', e => {
-      if (!dragging) return;
-      curY = Math.max(0, e.clientY - startY);
-      sheet.style.transform = 'translateY(' + curY + 'px)';
-    });
-    document.addEventListener('pointerup', () => {
-      if (!dragging) return;
-      dragging = false; sheet.style.transition = '';
-      if (curY > 90) close();
-      sheet.style.transform = '';
-    });
   })();
   </script>
 </body>
