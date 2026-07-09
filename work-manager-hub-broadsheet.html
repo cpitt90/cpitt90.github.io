@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Work Manager Hub — Chris Pitt UX Designer</title>
   <meta name="description" content="Case study: Led research and design of a unified Work Manager Hub for a global bank, consolidating 7+ tools and delivering measurable impact for 1000+ users." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -145,9 +145,9 @@
 
     /* ── Floating Pill Nav ── */
     .site-header {
-      position: fixed; top: 20px; left: 50%;
+      position: fixed; top: calc(20px + env(safe-area-inset-top)); left: 50%;
       transform: translateX(-50%);
-      z-index: 100; width: calc(100% - 32px); max-width: 1400px;
+      z-index: 100; width: calc(100% - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)); max-width: 1400px;
     }
     nav {
       display: flex; align-items: center; justify-content: space-between;
@@ -600,7 +600,7 @@
       .hero-meta-item:last-child  { border-radius: 0 0 10px 0; }
       .hero-img-wrap { padding: 0 24px; }
       .next-project { padding: 60px 24px; }
-      footer { padding: 24px; }
+      footer { padding: 24px 24px calc(24px + env(safe-area-inset-bottom)); }
       .results-grid { grid-template-columns: 1fr; }
     }
 

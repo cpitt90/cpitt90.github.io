@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Fund Finance Ratings — Chris Pitt UX Designer</title>
   <meta name="description" content="Case study: Joined a new product at Moody's Analytics with three months to launch, no handoff, and a team that had lost analyst trust. Shipped on time." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -144,10 +144,10 @@
 
     /* ── Floating Pill Nav ── */
     .site-header {
-      position: fixed; top: 20px; left: 50%;
+      position: fixed; top: calc(20px + env(safe-area-inset-top)); left: 50%;
       transform: translateX(-50%);
       z-index: 100;
-      width: calc(100% - 32px);
+      width: calc(100% - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));
       max-width: 1400px;
     }
     nav {
@@ -483,7 +483,7 @@
       .hero-meta-item:first-child { border-radius: 14px 14px 0 0; }
       .hero-meta-item:last-child  { border-radius: 0 0 14px 14px; }
       .next-project { padding: 60px 24px; }
-      footer { padding: 24px; }
+      footer { padding: 24px 24px calc(24px + env(safe-area-inset-bottom)); }
     }
 
     /* ── Contact Modal ── */

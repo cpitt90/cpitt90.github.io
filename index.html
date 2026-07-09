@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Chris Pitt — Senior UX Designer</title>
   <meta name="description" content="Senior UX Designer with 6+ years in finance. Moody's, Deutsche Bank, HSBC, Morgan Stanley. New York City." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -95,10 +95,10 @@
     /* ── Floating Pill Nav ── */
     .site-header {
       position: fixed;
-      top: 20px; left: 50%;
+      top: calc(20px + env(safe-area-inset-top)); left: 50%;
       transform: translateX(-50%);
       z-index: 100;
-      width: calc(100% - 32px);
+      width: calc(100% - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));
       max-width: 1400px;
     }
     nav {
@@ -796,7 +796,7 @@
       .hero-sub { white-space: normal; max-width: 340px; margin-left: auto; margin-right: auto; }
       .cards { grid-template-columns: 1fr; }
       .co-dot { display: none; }
-      footer { padding: 14px 20px; }
+      footer { padding: 14px 20px calc(14px + env(safe-area-inset-bottom)); }
       .f-copy { font-size: 11px; }
       .f-links { gap: 8px; }
       .f-link { font-size: 11px; padding: 10px 6px; }
