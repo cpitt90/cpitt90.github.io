@@ -144,6 +144,7 @@
     .nav-drawer.open { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
     .nav-drawer a { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -.01em; text-align: left; padding: 13px 18px; border-radius: 12px; transition: background .15s var(--ease); }
     .nav-drawer a:active { background: rgba(255,255,255,.09); }
+    @media (pointer: coarse) { .nav-link { min-height: 44px; display: flex; align-items: center; } }
 
     @media (max-width: 600px) {
       nav { padding: 6px 6px 6px 20px; }
@@ -193,6 +194,15 @@
     .cmodal-copy-btn:hover { background: rgba(111,190,252,.2); }
     .cmodal-arrow { color: var(--accent); font-size: 18px; transition: transform .2s var(--ease); flex-shrink: 0; }
     a.cmodal-row:hover .cmodal-arrow { transform: translateX(3px); }
+    .cmodal-handle { display: none; width: 40px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.22); margin: -4px auto 12px; flex-shrink: 0; }
+    @media (max-width: 600px) {
+      .cmodal-overlay { align-items: flex-end; padding: 0; }
+      .cmodal { max-width: 100%; width: 100%; border-radius: 24px 24px 0 0; padding: 14px 22px calc(28px + env(safe-area-inset-bottom)); transform: translateY(100%); transition: transform .4s var(--ease); }
+      .cmodal-overlay.open .cmodal { transform: translateY(0); }
+      .cmodal-handle { display: block; }
+      .cmodal-close { top: 16px; right: 16px; }
+      .cmodal-h { font-size: 25px; }
+    }
   </style>
 </head>
 <body>
@@ -422,6 +432,7 @@
   <!-- Contact Modal -->
   <div id="cmodal" class="cmodal-overlay" role="dialog" aria-modal="true" aria-label="Contact Chris Pitt">
     <div class="cmodal">
+      <div class="cmodal-handle" aria-hidden="true"></div>
       <button class="cmodal-close" id="cmodal-close" aria-label="Close">×</button>
       <div class="cmodal-avail"><span class="cmodal-avail-dot"></span><span class="cmodal-avail-text">Available for Work</span></div>
       <h2 class="cmodal-h">Let's talk.</h2>
@@ -464,6 +475,24 @@
       this.textContent='Copied!'; setTimeout(()=>this.textContent='Copy',2000);
     });
     document.querySelectorAll('[data-contact]').forEach(el => el.addEventListener('click', open));
+    const sheet = overlay.querySelector('.cmodal');
+    let startY = 0, curY = 0, dragging = false;
+    const sheetMode = () => matchMedia('(max-width: 600px)').matches;
+    sheet.addEventListener('pointerdown', e => {
+      if (!sheetMode() || e.target.closest('.cmodal-row, button, a')) return;
+      dragging = true; startY = e.clientY; curY = 0; sheet.style.transition = 'none';
+    });
+    document.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      curY = Math.max(0, e.clientY - startY);
+      sheet.style.transform = 'translateY(' + curY + 'px)';
+    });
+    document.addEventListener('pointerup', () => {
+      if (!dragging) return;
+      dragging = false; sheet.style.transition = '';
+      if (curY > 90) close();
+      sheet.style.transform = '';
+    });
   })();
   </script>
 </body>
