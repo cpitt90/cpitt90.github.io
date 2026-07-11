@@ -701,8 +701,22 @@
       .hero-tools { margin-top: 6px; }
       .hero-img-wrap { padding: 0 24px; }
       .next-project { padding: 60px 24px; }
-      footer { padding: 24px 24px calc(24px + env(safe-area-inset-bottom)); }
+      footer { padding: 24px 24px calc(24px + env(safe-area-inset-bottom)); flex-direction: column; align-items: flex-start; gap: 12px; }
       .results-grid { grid-template-columns: 1fr 1fr; }
+    }
+    /* Live widget: stack its body so it never forces the design column wider than the phone */
+    @media (max-width: 520px) {
+      .live-module .lm { aspect-ratio: auto; }
+      .lm-body { flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px 20px; }
+      .lm-break { flex: 1 1 100%; }
+      .lm-break-grid span { white-space: normal; }
+    }
+    /* Results stats: the two-column grid can't fit two stat cards on a phone; stack them */
+    @media (max-width: 440px) {
+      .results-grid { grid-template-columns: 1fr; }
+      .result-card + .result-card::before { display: none; }
+      .result-card { border-top: 1px solid rgba(255,255,255,.1); }
+      .result-card:first-child { border-top: none; }
     }
 
     /* ════════════════════════════════════════════
@@ -964,7 +978,7 @@
         </div>
         <div class="hero-meta-item">
           <span class="hero-meta-label">Timeline</span>
-          <div class="hero-meta-value">18 months</div>
+          <div class="hero-meta-value">8 months</div>
         </div>
         <div class="hero-meta-item">
           <span class="hero-meta-label">Users Impacted</span>
