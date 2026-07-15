@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <script>
+    /* Password gate: if not unlocked via the modal on the landing page, bounce back there. */
+    (function(){ try { if (sessionStorage.getItem('cs_unlocked') !== 'yes') { window.location.replace('index.html'); } } catch(e){} })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Fund Finance Ratings — Chris Pitt UX Designer</title>
   <meta name="description" content="Case study: Joined a new product at Moody's Analytics with three months to launch, no handoff, and a team that had lost analyst trust. Shipped on time." />
@@ -592,7 +596,7 @@
         </div>
         <div class="hero-meta-item">
           <span class="hero-meta-label">Company</span>
-          <div class="hero-meta-value">Moody's Analytics</div>
+          <div class="hero-meta-value">Credit Rating Agency</div>
         </div>
         <div class="hero-meta-item">
           <span class="hero-meta-label">Timeline</span>

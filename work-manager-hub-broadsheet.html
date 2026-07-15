@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <script>
+    /* Password gate: if not unlocked via the modal on the landing page, bounce back there. */
+    (function(){ try { if (sessionStorage.getItem('cs_unlocked') !== 'yes') { window.location.replace('index.html'); } } catch(e){} })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Work Manager Hub — Chris Pitt UX Designer</title>
   <meta name="description" content="Case study: Led research and design of a unified Work Manager Hub for a global bank, consolidating 7+ tools and delivering measurable impact for 1000+ users." />
